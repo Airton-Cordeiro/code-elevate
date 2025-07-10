@@ -13,8 +13,9 @@ module.exports = {
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov"],
   modulePathIgnorePatterns: [
-    "<rootDir>/src/infrastructure/config/aliases.ts",
+    "<rootDir>/doc/",
     "<rootDir>/dist/",
+    "<rootDir>/cypress/",
   ],
   testPathIgnorePatterns: ["<rootDir>/dist/"],
 };

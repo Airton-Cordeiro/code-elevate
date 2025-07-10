@@ -9,7 +9,7 @@ services:
       - 27017:27017
     volumes:
       - mongodb_data_container:/data/db
-      - ./fake_100_books.json:/docker-entrypoint-initdb.d/fake_100_books.json
+      - ./books.json:/docker-entrypoint-initdb.d/books.json
 
   redis_container:
     image: redis:latest
@@ -29,18 +29,6 @@ services:
     depends_on:
       - mongodb_container
       - redis_container
-
-  mongo_seed:
-    image: mongo:latest
-    depends_on:
-      - mongodb_container
-    volumes:
-      - ./fake_100_books.json:/fake_100_books.json
-    entrypoint: >
-      bash -c "
-        sleep 10 &&
-        mongoimport --host mongodb_container --username root --password password --authenticationDatabase admin --db books-db --collection books --drop --jsonArray --file /fake_100_books.json
-      "
 
 volumes:
   mongodb_data_container:
