@@ -143,13 +143,15 @@ Book {
 
 ### Endpoints disponíveis
 
-#### Swagger disponível na pasta doc.
+#### Swagger disponível na pasta doc ou no link abaixo
+
+https://app.swaggerhub.com/apis/santander-8d6/Code-Elevate/1.0.0
 
 | Endpoint                     | Descrição                                            |
 | ---------------------------- | ---------------------------------------------------- |
 | `GET /health`                | Health check da aplicação                            |
 | `GET /books`                 | Retorna todos os livros (com paginação)              |
-| `GET /books/:bookId`         | Busca livro por ID (com paginação)                   |
+| `GET /books/:bookId`         | Busca livro por ID                                   |
 | `GET /books/genre/:genre`    | Busca livros por gênero (com paginação)              |
 | `GET /books/author/:author`  | Busca livros por autor (com paginação)               |
 | `GET /books/recently-viewed` | Retorna os 10 últimos livros que o usuário pesquisou |
