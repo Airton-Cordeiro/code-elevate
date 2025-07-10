@@ -10,12 +10,9 @@ module.exports = {
     "!src/**/*.test.{ts,tsx}",
     "!src/**/index.ts",
   ],
+  testMatch: ["<rootDir>/src/**/*.test.ts"],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov"],
-  modulePathIgnorePatterns: [
-    "<rootDir>/doc/",
-    "<rootDir>/dist/",
-    "<rootDir>/cypress/",
-  ],
+  modulePathIgnorePatterns: ["<rootDir>/doc/", "<rootDir>/dist/"],
   testPathIgnorePatterns: ["<rootDir>/dist/"],
 };

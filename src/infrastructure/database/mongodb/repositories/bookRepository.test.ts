@@ -105,9 +105,9 @@ describe("BookRepository (MongoDB)", () => {
     mockCollection.countDocuments.mockResolvedValue(0);
     mockCollection.find.mockReturnValue(mockFindCursor);
     mockFindCursor.toArray.mockResolvedValue([]);
-    const result = await repo.getBooksByGenre(-1, 0, "Ficção");
-    expect(result.page.currentPage).toBe(1);
-    expect(result.page.limit).toBe(10);
+    await expect(repo.getBooksByGenre(-1, 0, "Ficção")).rejects.toThrow(
+      "No books found with genre Ficção."
+    );
   });
 
   it("deve capturar e lançar erro em getBooksByGenre", async () => {

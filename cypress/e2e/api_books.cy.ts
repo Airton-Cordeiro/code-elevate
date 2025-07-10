@@ -1,5 +1,3 @@
-import { data } from "cypress/types/jquery";
-
 describe("/Health", () => {
   it("deve retornar status OK no health", () => {
     cy.request("GET", "http://localhost:8000/health").then((response) => {
