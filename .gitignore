@@ -1,0 +1,25 @@
+# Dependências
+node_modules/
+
+# Build e transpile
+dist/
+build/
+coverage/
+*.log
+
+# Ambiente
+.env
+.env.*
+
+# Cypress
+cypress/downloads/
+cypress/screenshots/
+cypress/videos/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Relatórios
+coverage/
+lcov-report/

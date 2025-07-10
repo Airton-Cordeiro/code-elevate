@@ -1,0 +1,46 @@
+version: "3.7"
+services:
+  mongodb_container:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+      - ./fake_100_books.json:/docker-entrypoint-initdb.d/fake_100_books.json
+
+  redis_container:
+    image: redis:latest
+    ports:
+      - 6379:6379
+
+  app:
+    build: .
+    command: npm run start:dev
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - 8000:8000
+    environment:
+      MONGO_URL: mongodb://root:password@mongodb_container:27017/
+      REDIS_URL: redis://redis_container:6379
+    depends_on:
+      - mongodb_container
+      - redis_container
+
+  mongo_seed:
+    image: mongo:latest
+    depends_on:
+      - mongodb_container
+    volumes:
+      - ./fake_100_books.json:/fake_100_books.json
+    entrypoint: >
+      bash -c "
+        sleep 10 &&
+        mongoimport --host mongodb_container --username root --password password --authenticationDatabase admin --db books-db --collection books --drop --jsonArray --file /fake_100_books.json
+      "
+
+volumes:
+  mongodb_data_container:

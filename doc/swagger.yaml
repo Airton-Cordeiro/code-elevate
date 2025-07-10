@@ -1,0 +1,324 @@
+openapi: 3.0.3
+info:
+  title: Code Elevate - Airton Cordeiro
+  description: Esta API foi desenvolvida com o objetivo de buscar livros. Os endpoints desenvolvidos nela são responsáveis por buscar livros individualmente, listar todos os livros buscar por gênero, buscar por autor e mostrar livros que foram recentemente acessados por usuários.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Servidor local
+
+paths:
+  /books:
+    get:
+      summary: Lista livros paginados
+      description: Retorna uma lista paginada de livros.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Página atual
+          example: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Quantidade de itens por página
+          example: 10
+      responses:
+        "200":
+          description: Lista de livros
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Livro"
+              examples:
+                exemplo:
+                  value:
+                    - id: "1"
+                      title: "Romance Unveiled"
+                      subtitle: "An exploration of romance"
+                      author: "João Pedro Rocha"
+                      publisher: "Letras do Futuro"
+                      publicationDate: "2021-01-03"
+                      language: "pt"
+                      genres: ["fiction", "romance"]
+                      pages: 224
+                      format: "Paperback"
+                      description: "This book dives deep into the subject of romance, offering insights and practical guidance."
+                      coverImageUrl: "https://example.com/images/book-1.jpg"
+                      price: 33.45
+                      availability: "in_stock"
+                      averageRating: 4.6
+                      tags: ["fiction", "romance", "education", "reading"]
+                      createdAt: "2025-07-05T17:40:59.658363"
+                      updatedAt: "2025-07-05T17:40:59.658369"
+
+  /books/recently-viewed:
+    get:
+      summary: Lista livros recentemente visualizados
+      description: Retorna os livros visualizados recentemente pelo usuário.
+      responses:
+        "200":
+          description: Lista de livros
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Livro"
+              examples:
+                exemplo:
+                  value:
+                    - id: "2"
+                      title: "Reflections on Romance"
+                      subtitle: "An exploration of romance"
+                      author: "Vinícius Almeida"
+                      publisher: "Editora Saber"
+                      publicationDate: "2006-07-22"
+                      language: "pt"
+                      genres: ["fiction", "romance"]
+                      pages: 642
+                      format: "Hardcover"
+                      description: "This book dives deep into the subject of romance, offering insights and practical guidance."
+                      coverImageUrl: "https://example.com/images/book-2.jpg"
+                      price: 32.12
+                      availability: "in_stock"
+                      averageRating: 4.9
+                      tags: ["fiction", "romance", "education", "reading"]
+                      createdAt: "2025-07-05T17:40:59.658392"
+                      updatedAt: "2025-07-05T17:40:59.658393"
+
+  /books/{id}:
+    get:
+      summary: Busca livro por ID
+      description: Retorna os detalhes de um livro pelo seu ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do livro
+          example: "1"
+      responses:
+        "200":
+          description: Livro encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Livro"
+              examples:
+                exemplo:
+                  value:
+                    id: "1"
+                    title: "Romance Unveiled"
+                    subtitle: "An exploration of romance"
+                    author: "João Pedro Rocha"
+                    publisher: "Letras do Futuro"
+                    publicationDate: "2021-01-03"
+                    language: "pt"
+                    genres: ["fiction", "romance"]
+                    pages: 224
+                    format: "Paperback"
+                    description: "This book dives deep into the subject of romance, offering insights and practical guidance."
+                    coverImageUrl: "https://example.com/images/book-1.jpg"
+                    price: 33.45
+                    availability: "in_stock"
+                    averageRating: 4.6
+                    tags: ["fiction", "romance", "education", "reading"]
+                    createdAt: "2025-07-05T17:40:59.658363"
+                    updatedAt: "2025-07-05T17:40:59.658369"
+        "404":
+          description: Livro não encontrado
+
+  /books/genre/{genre}:
+    get:
+      summary: Lista livros por gênero
+      description: Retorna livros filtrados por gênero.
+      parameters:
+        - in: path
+          name: genre
+          required: true
+          schema:
+            type: string
+          description: Gênero do livro
+          example: "romance"
+        - in: query
+          name: page
+          schema:
+            type: integer
+          example: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          example: 10
+      responses:
+        "200":
+          description: Lista de livros
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Livro"
+              examples:
+                exemplo:
+                  value:
+                    - id: "1"
+                      title: "Romance Unveiled"
+                      subtitle: "An exploration of romance"
+                      author: "João Pedro Rocha"
+                      publisher: "Letras do Futuro"
+                      publicationDate: "2021-01-03"
+                      language: "pt"
+                      genres: ["fiction", "romance"]
+                      pages: 224
+                      format: "Paperback"
+                      description: "This book dives deep into the subject of romance, offering insights and practical guidance."
+                      coverImageUrl: "https://example.com/images/book-1.jpg"
+                      price: 33.45
+                      availability: "in_stock"
+                      averageRating: 4.6
+                      tags: ["fiction", "romance", "education", "reading"]
+                      createdAt: "2025-07-05T17:40:59.658363"
+                      updatedAt: "2025-07-05T17:40:59.658369"
+
+  /books/author/{author}:
+    get:
+      summary: Lista livros por autor
+      description: Retorna livros filtrados por autor.
+      parameters:
+        - in: path
+          name: author
+          required: true
+          schema:
+            type: string
+          description: Nome do autor
+          example: "João Pedro Rocha"
+        - in: query
+          name: page
+          schema:
+            type: integer
+          example: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          example: 10
+      responses:
+        "200":
+          description: Lista de livros
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Livro"
+              examples:
+                exemplo:
+                  value:
+                    - id: "1"
+                      title: "Romance Unveiled"
+                      subtitle: "An exploration of romance"
+                      author: "João Pedro Rocha"
+                      publisher: "Letras do Futuro"
+                      publicationDate: "2021-01-03"
+                      language: "pt"
+                      genres: ["fiction", "romance"]
+                      pages: 224
+                      format: "Paperback"
+                      description: "This book dives deep into the subject of romance, offering insights and practical guidance."
+                      coverImageUrl: "https://example.com/images/book-1.jpg"
+                      price: 33.45
+                      availability: "in_stock"
+                      averageRating: 4.6
+                      tags: ["fiction", "romance", "education", "reading"]
+                      createdAt: "2025-07-05T17:40:59.658363"
+                      updatedAt: "2025-07-05T17:40:59.658369"
+
+  /health:
+    get:
+      summary: Health check
+      description: Verifica se a API está online.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: OK
+
+components:
+  schemas:
+    Livro:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        title:
+          type: string
+          example: "Romance Unveiled"
+        subtitle:
+          type: string
+          example: "An exploration of romance"
+        author:
+          type: string
+          example: "João Pedro Rocha"
+        publisher:
+          type: string
+          example: "Letras do Futuro"
+        publicationDate:
+          type: string
+          format: date
+          example: "2021-01-03"
+        language:
+          type: string
+          example: "pt"
+        genres:
+          type: array
+          items:
+            type: string
+          example: ["fiction", "romance"]
+        pages:
+          type: integer
+          example: 224
+        format:
+          type: string
+          example: "Paperback"
+        description:
+          type: string
+          example: "This book dives deep into the subject of romance, offering insights and practical guidance."
+        coverImageUrl:
+          type: string
+          example: "https://example.com/images/book-1.jpg"
+        price:
+          type: number
+          example: 33.45
+        availability:
+          type: string
+          example: "in_stock"
+        averageRating:
+          type: number
+          example: 4.6
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["fiction", "romance", "education", "reading"]
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-07-05T17:40:59.658363"
+        updatedAt:
+          type: string
+          format: date-time
+          example:
