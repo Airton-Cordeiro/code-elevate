@@ -37,7 +37,7 @@ describe("RedisCacheRepository", () => {
       `book_cache:${mockBook.id}`,
       JSON.stringify(mockBook),
       "EX",
-      60
+      600
     );
     expect(redisMock.lrem).toHaveBeenCalledWith(
       "books_cache_ids",

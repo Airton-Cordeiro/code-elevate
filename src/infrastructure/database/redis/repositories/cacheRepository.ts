@@ -16,7 +16,7 @@ class RedisCacheRepository implements ICacheRepository {
     const bookKey = `book_cache:${book.id}`;
     const maxItems = 10;
 
-    await this.client.set(bookKey, JSON.stringify(book), "EX", 60);
+    await this.client.set(bookKey, JSON.stringify(book), "EX", 600);
     await this.client.lrem(listKey, 0, book.id);
     await this.client.lpush(listKey, book.id);
     await this.client.ltrim(listKey, 0, maxItems - 1);
