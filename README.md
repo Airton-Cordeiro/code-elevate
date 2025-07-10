@@ -10,36 +10,36 @@ Esta API foi desenvolvida com o objetivo de buscar livros. Os endpoints desenvol
 
 ### Detalhes do projeto
 
-A API foi desenvolvida com a finalidade em Node.js e Typescript:
+A API foi desenvolvida utilizando Node.js e Typescript:
 
 1. Buscar todos os livros
 2. Buscar livros por id
 3. Buscar livros por gênero
 4. Buscar livros por autor
-5. Visualização dos livros recentes visualizados
+5. Visualização dos livros recentemente visualizados
 
-O serviço foi feito utilizando cache para uma alta performance e escalabilidade.
+O serviço foi feito utilizando cache para alta performance e escalabilidade.
 
 ---
 
 ### 🚀 Como rodar o projeto
 
 1. Tenha [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/) instalados na sua máquina.
-2. Clone esse repositório: `git clone https://github.com/Airton-Cordeiro/code-elevate.git`
+2. Clone este repositório: `git clone https://github.com/Airton-Cordeiro/code-elevate.git`
 3. Na pasta **raiz** rode o comando `docker-compose up --build -d`
    - Os contêineres `mongodb`, `redis` e `code-elevate-app` serão buildados e inicializados
-4. O back-end pode ser acessado através do host http://localhost:8000 - Visualizar Swagger para todas as rotas na pasta /doc.
+4. O back-end pode ser acessado através do host http://localhost:8000 - Visualize o Swagger para todas as rotas na pasta /doc.
 
 ---
 
-### ✅ Testes end to end/Automatizados
+### ✅ Testes end-to-end/Automatizados
 
-Os testes end to end foram feitos utilizando [Cypress](https://www.cypress.io/) e podem ser rodados via:
+Os testes end-to-end foram feitos utilizando [Cypress](https://www.cypress.io/) e podem ser rodados via:
 
 1. Entrar no diretório `code-elevate`
 2. Via terminal rodar o comando `npm run cy:open`
 3. Clicar em "E2E Testing"
-4. Selecione o browser de sua preferência e clique o botão "Start E2E Testing in..."
+4. Selecione o browser de sua preferência e clique no botão "Start E2E Testing in..."
 5. Espere o navegador abrir e clique em "api_books.cy.js"
 6. Os testes irão rodar automaticamente
 
@@ -67,7 +67,7 @@ Os testes end to end foram feitos utilizando [Cypress](https://www.cypress.io/) 
 - **Banco de Dados:** [MongoDB](https://www.mongodb.com/)
 - **Cache:** [Redis](https://redis.io/)
 - **Documentação da API:** [Swagger](https://swagger.io/)(OpenApi 3.0)
-- **Build Tool:** [Typescript Compiler](https://www.typescriptlang.org/docs/handbook/compiler-options.html)
+- **Ferramenta de Build:** [Typescript Compiler](https://www.typescriptlang.org/docs/handbook/compiler-options.html)
 - **Containerização:** [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/)
 - **Testes Unitários:** [Jest](https://jestjs.io/pt-BR/)
 - **Controle de Versão:** Git + GitHub
@@ -84,7 +84,7 @@ Essa **inversão de dependência** permitiu:
 
 - Facilidade na substituição de tecnologias (ex: MongoDB → PostgreSQL)
 - Separação de responsabilidades
-- Testes unitários simples com mocks
+- Testes unitários facilitados por mocks
 - Evolução e manutenção mais seguras
 
 **⚠️ IMPORTANTE: A estrutura foi organizada nas seguintes camadas:⚠️**
@@ -100,7 +100,7 @@ Essa **inversão de dependência** permitiu:
 
 ---
 
-#### Banco de dados já está populado
+#### O banco de dados já está populado
 
 Ao iniciar o projeto com Docker pela primeira vez, o container do MongoDB já será populado com **livros reais**. Isso garante que a API funcione de forma imediata com dados reais — veja mais na próxima seção.
 
@@ -108,15 +108,16 @@ Ao iniciar o projeto com Docker pela primeira vez, o container do MongoDB já se
 
 ## II. Explicação sobre o Case Desenvolvido (Plano de Implementação)
 
-### Populando o banco de Dados
+### Populando o banco de dados
 
-Usando IA formatei a estrutura de dados (Book) que eu queria e dei o comando de gerar livros com campos aleatórios, respeitando os tipos de dados fornecidos inicialmente. Como eu não precisava de imagens, poderia simular as informações dos livros.
+Usando IA, formatei a estrutura de dados (Book) que eu queria e dei o comando para gerar livros com campos aleatórios, respeitando os tipos de dados fornecidos inicialmente. Como não precisava de imagens, pude simular as informações dos livros.
 
 ---
 
 ### 🧠 Entidade Livro (Modelo de Dados)
 
-```javascript
+```typescript
+// Modelo Book
 Book {
   id: "1",
   title: "Livro Exemplo",
@@ -169,8 +170,8 @@ Optei pelo MongoDB como banco de dados devido à sua flexibilidade de schema, o 
 ### Melhorias
 
 1. Mais filtros como: filtros por avaliação, por preço e filtros combinados.
-2. Monitoramento e observabilidade: identificar com base em métricas quais são os títulos/autores mais pesquisados para gerar.
-3. A função de avisar ao usuário quando o livro chegar.
+2. Monitoramento e observabilidade: identificar com base em métricas quais são os títulos/autores mais pesquisados para gerar recomendações ou relatórios.
+3. Implementar uma função para avisar o usuário quando o livro estiver disponível.
 
 ---
 
