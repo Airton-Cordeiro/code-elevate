@@ -12,40 +12,34 @@ class RedisCacheRepository implements ICacheRepository {
   }
 
   async setCache(book: Book): Promise<void> {
-    const key = "books_cache";
+    const listKey = "books_cache_ids";
+    const bookKey = `book_cache:${book.id}`;
     const maxItems = 10;
 
-    const currentBooks = await this.client.lrange(key, 0, -1);
-    for (const item of currentBooks) {
-      try {
-        const parsed = JSON.parse(item);
-        if (parsed.id === book.id) {
-          await this.client.lrem(key, 0, item);
-          break;
-        }
-      } catch (err) {
-        console.warn("Erro ao validar item duplicado.", err);
-      }
-    }
+    await this.client.set(bookKey, JSON.stringify(book), "EX", 60);
+    await this.client.lrem(listKey, 0, book.id);
+    await this.client.lpush(listKey, book.id);
+    await this.client.ltrim(listKey, 0, maxItems - 1);
 
-    await this.client.lpush(key, JSON.stringify(book));
-    await this.client.ltrim(key, 0, maxItems - 1);
-    await this.client.expire(key, 600);
+    const ids = await this.client.lrange(listKey, maxItems, -1);
+    for (const oldId of ids) {
+      await this.client.del(`book_cache:${oldId}`);
+    }
   }
 
   async getCache(): Promise<Book[]> {
-    const key = "books_cache";
-    const cachedBooks = await this.client.lrange(key, 0, -1);
-    if (cachedBooks.length === 0) return [];
-    return cachedBooks
-      .map((item) => {
+    const listKey = "books_cache_ids";
+    const ids = await this.client.lrange(listKey, 0, -1);
+    const books: Book[] = [];
+    for (const id of ids) {
+      const cached = await this.client.get(`book_cache:${id}`);
+      if (cached) {
         try {
-          return JSON.parse(item);
-        } catch {
-          return null;
-        }
-      })
-      .filter((book) => book !== null);
+          books.push(JSON.parse(cached));
+        } catch {}
+      }
+    }
+    return books;
   }
 }
 export default RedisCacheRepository;

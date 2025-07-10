@@ -22,6 +22,13 @@ class BookRepository implements IBookRepository {
 
       //@ts-ignore
       const total = await booksCollection.countDocuments();
+
+      if (!total) {
+        const error: any = new Error(`books not found.`);
+        error.statusCode = HttpStatus.NOT_FOUND;
+        throw error;
+      }
+
       const docs = await booksCollection
         .find({}, { projection: { _id: 0 } })
         .sort({ _id: -1 })
@@ -30,12 +37,6 @@ class BookRepository implements IBookRepository {
         .toArray();
 
       const books = docs.map((book: any) => new Book(book));
-
-      if (!total) {
-        const error: any = new Error(`books not found.`);
-        error.statusCode = HttpStatus.SUCCESS;
-        throw error;
-      }
 
       if (books.length === 0 && total > 0) {
         const skip = 10;
