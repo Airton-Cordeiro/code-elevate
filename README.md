@@ -28,7 +28,7 @@ O serviço foi feito utilizando cache para alta performance e escalabilidade.
 2. Clone este repositório: `git clone https://github.com/Airton-Cordeiro/code-elevate.git`
 3. Na pasta **raiz** rode o comando `docker-compose up --build -d`
    - Os contêineres `mongodb`, `redis` e `code-elevate-app` serão buildados e inicializados
-4. O back-end pode ser acessado através do host http://localhost:8000 - Visualize o Swagger para todas as rotas na pasta /doc.
+4. O serviço pode ser acessado através do host http://localhost:8000 - Visualize o Swagger para todas as rotas na pasta /doc.
 
 ---
 

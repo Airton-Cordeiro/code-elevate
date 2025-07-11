@@ -7,10 +7,6 @@ build/
 coverage/
 *.log
 
-# Ambiente
-.env
-.env.*
-
 # Cypress
 cypress/downloads/
 cypress/screenshots/
