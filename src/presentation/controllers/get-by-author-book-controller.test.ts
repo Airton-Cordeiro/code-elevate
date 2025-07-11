@@ -8,6 +8,7 @@ describe("GetByAuthorBookController", () => {
   let controller: GetByAuthorBookController;
   let req: Partial<Request>;
   let res: Partial<Response>;
+  let consoleErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
     useCase = { execute: jest.fn() };
@@ -20,6 +21,11 @@ describe("GetByAuthorBookController", () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn().mockReturnThis(),
     };
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
   });
 
   it("deve retornar livros por autor com status 200", async () => {
@@ -31,9 +37,145 @@ describe("GetByAuthorBookController", () => {
   });
 
   it("deve retornar erro 500 em caso de exceção", async () => {
-    useCase.execute.mockRejectedValue(new Error("Erro interno"));
+    const error = new Error("Erro interno");
+    useCase.execute.mockRejectedValue(error);
     await controller.handle(req as Request, res as Response);
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Error fetching books by author:",
+      error
+    );
     expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
     expect(res.json).toHaveBeenCalledWith({ error: "Erro interno" });
+  });
+
+  it("deve retornar erro 404 quando autor não é encontrado", async () => {
+    const notFoundError = new Error("Author 'Autor Exemplo' not found.");
+    (notFoundError as any).statusCode = HttpStatus.NOT_FOUND;
+
+    useCase.execute.mockRejectedValue(notFoundError);
+    await controller.handle(req as Request, res as Response);
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Error fetching books by author:",
+      notFoundError
+    );
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Author 'Autor Exemplo' not found.",
+    });
+  });
+
+  it("deve retornar erro 400 para parâmetros inválidos", async () => {
+    const badRequestError = new Error("Invalid pagination parameters.");
+    (badRequestError as any).statusCode = HttpStatus.BAD_REQUEST;
+
+    useCase.execute.mockRejectedValue(badRequestError);
+    await controller.handle(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Invalid pagination parameters.",
+    });
+  });
+
+  it("deve retornar erro 500 quando erro não tem statusCode definido", async () => {
+    const errorWithoutStatus = new Error("Erro sem statusCode");
+
+    useCase.execute.mockRejectedValue(errorWithoutStatus);
+    await controller.handle(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(res.json).toHaveBeenCalledWith({ error: "Erro sem statusCode" });
+  });
+
+  it("deve retornar erro 500 com mensagem padrão quando erro não tem message", async () => {
+    const errorWithoutMessage = {};
+
+    useCase.execute.mockRejectedValue(errorWithoutMessage);
+    await controller.handle(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(res.json).toHaveBeenCalledWith({ error: "Internal server error" });
+  });
+
+  it("deve lidar com query parameters undefined", async () => {
+    req.query = {};
+    useCase.execute.mockResolvedValue(mockBooksArray);
+
+    await controller.handle(req as Request, res as Response);
+
+    expect(useCase.execute).toHaveBeenCalledWith(NaN, NaN, "Autor Exemplo");
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.SUCCESS);
+  });
+
+  it("deve lidar com req.query sendo undefined", async () => {
+    req.query = undefined;
+    useCase.execute.mockResolvedValue(mockBooksArray);
+
+    await controller.handle(req as Request, res as Response);
+
+    expect(useCase.execute).toHaveBeenCalledWith(NaN, NaN, "Autor Exemplo");
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.SUCCESS);
+  });
+
+  it("deve lidar com req.params sendo undefined", async () => {
+    req.params = undefined;
+    useCase.execute.mockResolvedValue(mockBooksArray);
+
+    await controller.handle(req as Request, res as Response);
+
+    expect(useCase.execute).toHaveBeenCalledWith(1, 10, "undefined");
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.SUCCESS);
+  });
+
+  it("deve lidar com req.params.author sendo undefined", async () => {
+    req.params = {};
+    useCase.execute.mockResolvedValue(mockBooksArray);
+
+    await controller.handle(req as Request, res as Response);
+
+    expect(useCase.execute).toHaveBeenCalledWith(1, 10, "undefined");
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.SUCCESS);
+  });
+
+  it("deve converter valores não numéricos para NaN", async () => {
+    req.query = { page: "abc", limit: "xyz" };
+    useCase.execute.mockResolvedValue(mockBooksArray);
+
+    await controller.handle(req as Request, res as Response);
+
+    expect(useCase.execute).toHaveBeenCalledWith(NaN, NaN, "Autor Exemplo");
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.SUCCESS);
+  });
+
+  it("deve converter null para NaN nos parâmetros numéricos", async () => {
+    req.query = { page: undefined, limit: undefined };
+    useCase.execute.mockResolvedValue(mockBooksArray);
+
+    await controller.handle(req as Request, res as Response);
+
+    expect(useCase.execute).toHaveBeenCalledWith(NaN, NaN, "Autor Exemplo");
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.SUCCESS);
+  });
+
+  it("deve converter objetos para string no parâmetro author", async () => {
+    req.params = { author: { name: "Autor" } as unknown as string };
+    useCase.execute.mockResolvedValue(mockBooksArray);
+
+    await controller.handle(req as Request, res as Response);
+
+    expect(useCase.execute).toHaveBeenCalledWith(1, 10, "[object Object]");
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.SUCCESS);
+  });
+
+  it("deve lidar com request completamente vazio", async () => {
+    const emptyReq = {} as Request;
+    useCase.execute.mockResolvedValue(mockBooksArray);
+
+    await controller.handle(emptyReq, res as Response);
+
+    expect(useCase.execute).toHaveBeenCalledWith(NaN, NaN, "undefined");
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.SUCCESS);
   });
 });

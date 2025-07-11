@@ -34,4 +34,37 @@ describe("GetRecentlyViewedBooksController", () => {
     expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
     expect(res.json).toHaveBeenCalledWith({ error: "Erro interno" });
   });
+
+  it("deve retornar erro 503 quando cache não está disponível", async () => {
+    const serviceUnavailableError = new Error("Cache service unavailable.");
+    (serviceUnavailableError as any).statusCode = 503;
+
+    useCase.execute.mockRejectedValue(serviceUnavailableError);
+    await controller.handle(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(503);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Cache service unavailable.",
+    });
+  });
+
+  it("deve retornar erro 500 quando erro não tem statusCode definido", async () => {
+    const errorWithoutStatus = new Error("Erro sem statusCode");
+
+    useCase.execute.mockRejectedValue(errorWithoutStatus);
+    await controller.handle(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(res.json).toHaveBeenCalledWith({ error: "Erro sem statusCode" });
+  });
+
+  it("deve retornar erro 500 com mensagem padrão quando erro não tem message", async () => {
+    const errorWithoutMessage = {};
+
+    useCase.execute.mockRejectedValue(errorWithoutMessage);
+    await controller.handle(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(res.json).toHaveBeenCalledWith({ error: "Internal server error" });
+  });
 });

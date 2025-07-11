@@ -35,4 +35,35 @@ describe("GetByIdBookController", () => {
     expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
     expect(res.json).toHaveBeenCalledWith({ error: "Erro interno" });
   });
+
+  it("deve retornar erro 404 quando livro não encontrado", async () => {
+    const notFoundError = new Error("Book ID 1 not found.");
+    (notFoundError as any).statusCode = HttpStatus.NOT_FOUND;
+
+    useCase.execute.mockRejectedValue(notFoundError);
+    await controller.handle(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+    expect(res.json).toHaveBeenCalledWith({ error: "Book ID 1 not found." });
+  });
+
+  it("deve retornar erro 500 quando erro não tem statusCode definido", async () => {
+    const errorWithoutStatus = new Error("Erro sem statusCode");
+
+    useCase.execute.mockRejectedValue(errorWithoutStatus);
+    await controller.handle(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(res.json).toHaveBeenCalledWith({ error: "Erro sem statusCode" });
+  });
+
+  it("deve retornar erro 500 com mensagem padrão quando erro não tem message", async () => {
+    const errorWithoutMessage = {};
+
+    useCase.execute.mockRejectedValue(errorWithoutMessage);
+    await controller.handle(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(res.json).toHaveBeenCalledWith({ error: "Internal server error" });
+  });
 });
