@@ -25,7 +25,7 @@ class BookRepository implements IBookRepository {
 
       if (!total) {
         const error: any = new Error(`books not found.`);
-        error.statusCode = HttpStatus.NOT_FOUND;
+        error.statusCode = HttpStatus.SUCCESS;
         throw error;
       }
 
