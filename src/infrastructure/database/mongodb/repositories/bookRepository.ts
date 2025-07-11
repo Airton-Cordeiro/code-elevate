@@ -37,41 +37,26 @@ class BookRepository implements IBookRepository {
         .toArray();
 
       const books = docs.map((book: any) => new Book(book));
+      const totalPages = Math.ceil(total / safeLimit);
 
-      if (books.length === 0 && total > 0) {
-        const skip = 10;
-        const safeLimit = 10;
-
-        const docs = await booksCollection
-          .find({}, { projection: { _id: 0 } })
-          .sort({ _id: -1 })
-          .skip(skip)
-          .limit(safeLimit)
-          .toArray();
-
-        const books = docs.map((book: any) => new Book(book));
-
-        return {
-          page: {
-            totalItems: total,
-            totalPages: Math.ceil(total / safeLimit),
-            currentPage: safePage,
-            limit: safeLimit,
-          },
-          data: books,
-        };
+      if (books.length === 0 && safePage > totalPages) {
+        const error: any = new Error(
+          `Page ${safePage} not found. Total pages available: ${totalPages}`
+        );
+        error.statusCode = HttpStatus.NOT_FOUND;
+        throw error;
       }
       return {
         page: {
           totalItems: total,
-          totalPages: Math.ceil(total / safeLimit),
+          totalPages: totalPages,
           currentPage: safePage,
           limit: safeLimit,
         },
         data: books,
       };
     } catch (error: any) {
-      error.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+      console.log("Error fetching all books:", error);
       throw error;
     }
   }
@@ -88,7 +73,7 @@ class BookRepository implements IBookRepository {
       );
 
       if (!book) {
-        const error: any = new Error(`Livro com ID ${id} não encontrado.`);
+        const error: any = new Error(`Book ID ${id} not found.`);
         error.statusCode = HttpStatus.NOT_FOUND;
         throw error;
       }
@@ -111,9 +96,15 @@ class BookRepository implements IBookRepository {
       const safePage = Number(page) > 0 ? Number(page) : 1;
       const safeLimit = Number(limit) > 0 ? Number(limit) : 10;
       const skip = (safePage - 1) * safeLimit;
-
+      genre = genre.toLowerCase();
       //@ts-ignore
       const total = await booksCollection.countDocuments({ genres: genre });
+
+      if (total === 0) {
+        const error: any = new Error(`No books found with genre ${genre}.`);
+        error.statusCode = HttpStatus.NOT_FOUND;
+        throw error;
+      }
       const docs = await booksCollection
         .find({ genres: genre }, { projection: { _id: 0 } })
         .sort({ _id: -1 })
@@ -123,11 +114,16 @@ class BookRepository implements IBookRepository {
 
       const books = docs.map((book: any) => new Book(book));
 
-      if (books.length === 0) {
-        const error: any = new Error(`No books found with genre ${genre}.`);
-        error.statusCode = HttpStatus.SUCCESS;
+      const totalPages = Math.ceil(total / safeLimit);
+
+      if (books.length === 0 && safePage > totalPages) {
+        const error: any = new Error(
+          `Page ${safePage} not found. Total pages available: ${totalPages}`
+        );
+        error.statusCode = HttpStatus.NOT_FOUND;
         throw error;
       }
+
       return {
         page: {
           totalItems: total,
@@ -158,6 +154,12 @@ class BookRepository implements IBookRepository {
 
       //@ts-ignore
       const total = await booksCollection.countDocuments({ author: author });
+
+      if (total === 0) {
+        const error: any = new Error(`No books found with author ${author}.`);
+        error.statusCode = HttpStatus.NOT_FOUND;
+        throw error;
+      }
       const docs = await booksCollection
         .find({ author: author }, { projection: { _id: 0 } })
         .sort({ _id: -1 })
@@ -166,6 +168,17 @@ class BookRepository implements IBookRepository {
         .toArray();
 
       const books = docs.map((book: any) => new Book(book));
+
+      const totalPages = Math.ceil(total / safeLimit);
+
+      if (books.length === 0 && safePage > totalPages) {
+        const error: any = new Error(
+          `Page ${safePage} not found. Total pages available: ${totalPages}`
+        );
+        error.statusCode = HttpStatus.NOT_FOUND;
+        throw error;
+      }
+
       return {
         page: {
           totalItems: total,
@@ -176,7 +189,7 @@ class BookRepository implements IBookRepository {
         data: books,
       };
     } catch (error) {
-      console.info("Erro ao buscar livros por autor:", error);
+      console.info("Error fetching books by author:", error);
       throw error;
     }
   }

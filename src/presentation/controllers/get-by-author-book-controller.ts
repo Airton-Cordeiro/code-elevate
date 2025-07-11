@@ -18,7 +18,7 @@ class GetByAuthorBookController {
     } catch (error: any) {
       console.error("Error fetching books by author:", error);
       return res
-        .status(error.status || HttpStatus.INTERNAL_SERVER_ERROR)
+        .status(error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ error: error.message || "Internal server error" });
     }
   }

@@ -36,7 +36,7 @@ describe("/Books/id", () => {
       failOnStatusCode: false,
     }).then((response) => {
       expect(response.status).to.eq(404);
-      expect(response.body).to.have.property("error", "book ID 110 not found.");
+      expect(response.body).to.have.property("error", "Book ID 110 not found.");
     });
   });
 });
@@ -60,7 +60,7 @@ describe("/Books/Genre", () => {
       url: `http://localhost:8000/books/genre/${invalidGenre}`,
       failOnStatusCode: false,
     }).then((response) => {
-      expect(response.status).to.eq(200);
+      expect(response.status).to.eq(404);
       expect(response.body).to.have.property(
         "error",
         "No books found with genre fictions."
@@ -85,18 +85,17 @@ describe("/Books/author", () => {
   });
 
   it("deve retornar erro para autor não encontrado", () => {
-    const nonExistentAuthor = "nonexistent";
+    const nonExistentAuthor = "Joã Pedro Rocha";
     cy.request({
       method: "GET",
       url: `http://localhost:8000/books/author/${nonExistentAuthor}`,
       failOnStatusCode: false,
     }).then((response) => {
-      expect(response.status).to.eq(200);
-      expect(response.body).to.have.property("data");
-      expect(response.body.data).to.be.an("array");
-      expect(response.body.page).to.have.property("totalItems");
-      expect(response.body.page).to.have.property("totalPages");
-      expect(response.body.page).to.have.property("currentPage");
+      expect(response.status).to.eq(404);
+      expect(response.body).to.have.property(
+        "error",
+        "No books found with author Joã Pedro Rocha."
+      );
     });
   });
 });

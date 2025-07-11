@@ -75,7 +75,7 @@ describe("BookRepository (MongoDB)", () => {
     mockCollection.findOne.mockResolvedValue(undefined);
 
     await expect(repo.getBookById("999")).rejects.toThrow(
-      "Livro com ID 999 não encontrado."
+      "Book ID 999 not found."
     );
   });
 
@@ -93,10 +93,10 @@ describe("BookRepository (MongoDB)", () => {
     expect(result.data).toHaveLength(1);
     expect(result.page.totalItems).toBe(1);
     expect(mockCollection.countDocuments).toHaveBeenCalledWith({
-      genres: "Ficção",
+      genres: "ficção",
     });
     expect(mockCollection.find).toHaveBeenCalledWith(
-      { genres: "Ficção" },
+      { genres: "ficção" },
       { projection: { _id: 0 } }
     );
   });
@@ -106,7 +106,7 @@ describe("BookRepository (MongoDB)", () => {
     mockCollection.find.mockReturnValue(mockFindCursor);
     mockFindCursor.toArray.mockResolvedValue([]);
     await expect(repo.getBooksByGenre(-1, 0, "Ficção")).rejects.toThrow(
-      "No books found with genre Ficção."
+      "No books found with genre ficção."
     );
   });
 
@@ -138,9 +138,9 @@ describe("BookRepository (MongoDB)", () => {
     mockCollection.countDocuments.mockResolvedValue(0);
     mockCollection.find.mockReturnValue(mockFindCursor);
     mockFindCursor.toArray.mockResolvedValue([]);
-    const result = await repo.getBooksByAuthor(-1, 0, "Autor Exemplo");
-    expect(result.page.currentPage).toBe(1);
-    expect(result.page.limit).toBe(10);
+    await expect(repo.getBooksByAuthor(-1, 0, "Autor Exemplo")).rejects.toThrow(
+      "No books found with author Autor Exemplo."
+    );
   });
 
   it("deve capturar e lançar erro em getBooksByAuthor", async () => {
@@ -153,5 +153,15 @@ describe("BookRepository (MongoDB)", () => {
   it("deve capturar e lançar erro em getAllBooks", async () => {
     mockCollection.countDocuments.mockRejectedValue(new Error("Erro de banco"));
     await expect(repo.getAllBooks(1, 10)).rejects.toThrow("Erro de banco");
+  });
+
+  it("deve lançar erro para página inexistente em getAllBooks", async () => {
+    mockCollection.countDocuments.mockResolvedValue(25); // 3 páginas de 10
+    mockCollection.find.mockReturnValue(mockFindCursor);
+    mockFindCursor.toArray.mockResolvedValue([]); // página 100 não tem dados
+
+    await expect(repo.getAllBooks(100, 10)).rejects.toThrow(
+      "Page 100 not found. Total pages available: 3"
+    );
   });
 });

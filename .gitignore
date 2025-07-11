@@ -11,6 +11,7 @@ coverage/
 cypress/downloads/
 cypress/screenshots/
 cypress/videos/
+cypress.config.ts
 
 # Sistema operacional
 .DS_Store
