@@ -4,11 +4,12 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: books-db
     ports:
       - 27017:27017
     volumes:
       - mongodb_data_container:/data/db
-      - ./books.json:/docker-entrypoint-initdb.d/books.json
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
 
   redis_container:
     image: redis:latest
@@ -24,7 +25,7 @@ services:
     ports:
       - 8000:8000
     environment:
-      MONGO_URL: mongodb://root:password@mongodb_container:27017/
+      MONGO_URL: mongodb://root:password@mongodb_container:27017/books-db
       REDIS_URL: redis://redis_container:6379
     depends_on:
       - mongodb_container
