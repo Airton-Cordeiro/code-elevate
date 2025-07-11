@@ -170,8 +170,8 @@ Optei pelo MongoDB como banco de dados devido à sua flexibilidade de schema, o 
 ### Melhorias
 
 1. Mais filtros como: filtros por avaliação, por preço e filtros combinados.
-2. Monitoramento e observabilidade: identificar com base em métricas quais são os títulos/autores mais pesquisados para gerar recomendações ou relatórios.
-3. Implementar uma função para avisar o usuário quando o livro estiver disponível.
+2. Monitoramento e observabilidade: identificar com base em métricas quais são os títulos/autores mais pesquisados para gerar recomendações ou relatórios como por exemplo usando o elasticsearch.
+3. Implementar uma função para avisar o usuário quando o livro estiver disponível (em estoque) como por exemplo por e-mail o SendGrid.
 
 ---
 
